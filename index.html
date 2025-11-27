@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Journal | Artisan Minimalism</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@200;300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Jost', sans-serif; 
+            font-weight: 300;
+            font-size: 16px;
+            background: #F0EBE3; 
+            color: #5E6152;
+            overflow-x: hidden;
+        }
+        .font-serif { font-family: 'Playfair Display', 'Cormorant Garamond', serif; }
+        
+        :root {
+            --sage: #B8D4CE;
+            --sage-dark: #9FB8AD;
+            --sage-deeper: #7A9A8E;
+            --text-olive: #5E6152;
+            --text-green: #5E6152;
+            --cream: #F0EBE3;
+            --warm-gray: #EDE8E0;
+        }
+        
+        html { scroll-behavior: smooth; }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--cream); }
+        ::-webkit-scrollbar-thumb { background: var(--sage-dark); border-radius: 3px; }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .animate-fade-up { animation: fadeInUp 1s ease-out forwards; }
+        .animate-fade { animation: fadeIn 1.2s ease-out forwards; }
+        .animate-slide { animation: slideIn 0.8s ease-out forwards; }
+        .animate-scale { animation: scaleIn 0.6s ease-out forwards; }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+        
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .delay-500 { animation-delay: 0.5s; }
+        
+        /* Premium image hover */
+        .img-premium {
+            overflow: hidden;
+            position: relative;
+        }
+        .img-premium img {
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .img-premium:hover img {
+            transform: scale(1.05);
+        }
+        .img-premium::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.3) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .img-premium:hover::after {
+            opacity: 1;
+        }
+        
+        /* Navigation underline effect */
+        .nav-link {
+            position: relative;
+            overflow: hidden;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: currentColor;
+            transform: translateX(-101%);
+            transition: transform 0.4s ease;
+        }
+        .nav-link:hover::after {
+            transform: translateX(0);
+        }
+        
+        /* Button styles */
+        .btn-primary {
+            background: var(--sage-deeper);
+            color: white;
+            padding: 18px 48px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-size: 13px;
+            font-weight: 400;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--text-olive);
+            transform: translateX(-101%);
+            transition: transform 0.4s ease;
+        }
+        .btn-primary:hover::before {
+            transform: translateX(0);
+        }
+        .btn-primary span {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .btn-outline {
+            border: 1px solid var(--text-olive);
+            color: var(--text-olive);
+            padding: 16px 44px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-size: 13px;
+            font-weight: 400;
+            transition: all 0.4s ease;
+            background: transparent;
+        }
+        .btn-outline:hover {
+            background: var(--text-olive);
+            color: white;
+        }
+        
+        /* Label tag */
+        .tag {
+            background: var(--sage);
+            color: var(--text-olive);
+            padding: 10px 24px;
+            font-family: 'Playfair Display', 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-size: 16px;
+        }
+        
+        /* Section transitions */
+        .section-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+        .section-reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Parallax effect */
+        .parallax-container {
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Color swatches */
+        .swatch {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .swatch:hover {
+            transform: scale(1.15);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        /* Mobile menu */
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+        
+        /* Masonry-like grid */
+        .masonry-item:nth-child(2) { margin-top: 40px; }
+        .masonry-item:nth-child(3) { margin-top: 80px; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        
+        const TheJournalWebsite = () => {
+            const [currentPage, setCurrentPage] = useState('home');
+            const [isScrolled, setIsScrolled] = useState(false);
+            const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+            const [activeCategory, setActiveCategory] = useState('all');
+            
+            useEffect(() => {
+                const handleScroll = () => setIsScrolled(window.scrollY > 80);
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+            
+            // Close mobile menu on page change
+            useEffect(() => {
+                setMobileMenuOpen(false);
+                window.scrollTo(0, 0);
+            }, [currentPage]);
+            
+            const navItems = [
+                { id: 'home', label: 'Home' },
+                { id: 'story', label: 'Our Story' },
+                { id: 'collections', label: 'Collections' },
+                { id: 'craftsmanship', label: 'Craftsmanship' },
+                { id: 'lookbook', label: 'Lookbook' },
+            ];
+            
+            // Navigation Component
+            const Navigation = () => (
+                <>
+                    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
+                        isScrolled ? 'bg-[#F0EBE3]/95 backdrop-blur-md py-4 shadow-sm' : 'bg-transparent py-6'
+                    }`}>
+                        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                            <div className="flex items-center justify-between">
+                                {/* Logo */}
+                                <button 
+                                    onClick={() => setCurrentPage('home')}
+                                    className="group"
+                                >
+                                    <span className={`font-serif text-3xl md:text-4xl tracking-wider transition-colors ${
+                                        isScrolled || currentPage !== 'home' ? 'text-[#5E6152]' : 'text-white'
+                                    }`}>
+                                        The Journal
+                                    </span>
+                                </button>
+                                
+                                {/* Desktop Navigation */}
+                                <div className="hidden lg:flex items-center gap-10">
+                                    {navItems.map((item, i) => (
+                                        <button
+                                            key={item.id}
+                                            onClick={() => setCurrentPage(item.id)}
+                                            className={`nav-link text-sm tracking-[0.15em] uppercase transition-colors ${
+                                                isScrolled || currentPage !== 'home'
+                                                    ? (currentPage === item.id ? 'text-[#5E6152]' : 'text-[#5E6152]/60 hover:text-[#5E6152]')
+                                                    : (currentPage === item.id ? 'text-white' : 'text-white/70 hover:text-white')
+                                            }`}
+                                            style={{ animationDelay: `${i * 0.1}s` }}
+                                        >
+                                            {item.label}
+                                        </button>
+                                    ))}
+                                </div>
+                                
+                                {/* Mobile Menu Button */}
+                                <button 
+                                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                                    className="lg:hidden flex flex-col gap-1.5 p-2"
+                                >
+                                    <span className={`w-6 h-px transition-all ${isScrolled || currentPage !== 'home' ? 'bg-[#5E6152]' : 'bg-[#F0EBE3]'} ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`}></span>
+                                    <span className={`w-6 h-px transition-all ${isScrolled || currentPage !== 'home' ? 'bg-[#5E6152]' : 'bg-[#F0EBE3]'} ${mobileMenuOpen ? 'opacity-0' : ''}`}></span>
+                                    <span className={`w-6 h-px transition-all ${isScrolled || currentPage !== 'home' ? 'bg-[#5E6152]' : 'bg-[#F0EBE3]'} ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`}></span>
+                                </button>
+                            </div>
+                        </div>
+                    </nav>
+                    
+                    {/* Mobile Menu */}
+                    <div className={`mobile-menu fixed inset-0 z-40 bg-[#F0EBE3] ${mobileMenuOpen ? 'open' : ''}`}>
+                        <div className="flex flex-col items-center justify-center h-full gap-10">
+                            {navItems.map(item => (
+                                <button
+                                    key={item.id}
+                                    onClick={() => setCurrentPage(item.id)}
+                                    className={`font-serif text-4xl ${currentPage === item.id ? 'text-[#5E6152]' : 'text-[#5E6152]/50'}`}
+                                >
+                                    {item.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </>
+            );
+            
+            // Home Page
+            const HomePage = () => (
+                <div className="animate-fade">
+                    {/* Hero Section */}
+                    <section className="relative h-screen flex items-center justify-center overflow-hidden">
+                        {/* Full Background Image */}
+                        <div className="absolute inset-0">
+                            <img 
+                                src="images/page4_img2.jpeg" 
+                                alt="Hero" 
+                                className="w-full h-full object-cover"
+                            />
+                            {/* Subtle dark gradient overlay for text readability */}
+                            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/50"></div>
+                        </div>
+                        
+                        <div className="relative z-10 text-center px-6 max-w-5xl">
+                            <p className="text-white/90 text-base md:text-lg tracking-[0.4em] uppercase mb-8 animate-fade-up">Artisan Minimalism</p>
+                            <h1 className="font-serif text-6xl md:text-8xl lg:text-9xl text-white mb-8 animate-fade-up delay-100" style={{fontWeight: 400, textShadow: '0 2px 20px rgba(0,0,0,0.3)'}}>
+                                The Journal
+                            </h1>
+                            <p className="font-serif text-2xl md:text-3xl text-white/95 italic mb-12 animate-fade-up delay-200" style={{textShadow: '0 1px 10px rgba(0,0,0,0.3)'}}>
+                                Each piece tells a story of memorable details
+                            </p>
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up delay-300">
+                                <button onClick={() => setCurrentPage('collections')} className="btn-primary">
+                                    <span>Explore Collections</span>
+                                </button>
+                                <button onClick={() => setCurrentPage('story')} className="btn-outline" style={{borderColor: 'white', color: 'white'}}>
+                                    Our Story
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {/* Scroll Indicator */}
+                        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-float">
+                            <div className="flex flex-col items-center gap-2">
+                                <span className="text-white/70 text-xs tracking-widest uppercase">Scroll</span>
+                                <div className="w-px h-12 bg-[#F0EBE3]/50"></div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    {/* Brand Statement */}
+                    <section className="py-32 px-6 bg-[#F0EBE3]">
+                        <div className="max-w-5xl mx-auto text-center">
+                            <p className="text-sm tracking-[0.3em] uppercase text-[#5E6152]/60 mb-8">Philosophy</p>
+                            <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl leading-relaxed text-[#5E6152] mb-10" style={{fontWeight: 400}}>
+                                A brand that embraces <span className="italic">minimalism</span> blending with 
+                                pieces that feature intricate <span className="italic">artisanal crafts</span>
+                            </h2>
+                            <div className="w-24 h-px bg-[#5E6152]/30 mx-auto mb-10"></div>
+                            <p className="text-[#5E6152]/80 text-xl leading-relaxed max-w-3xl mx-auto">
+                                The collection is carefree, modern yet dreamy and defined by an unconventional 
+                                sophistication that makes every piece feel like a statement.
+                            </p>
+                        </div>
+                    </section>
+                    
+                    {/* Featured Grid */}
+                    <section className="py-24 px-6" style={{backgroundColor: '#E8E3DB'}}>
+                        <div className="max-w-7xl mx-auto">
+                            <div className="grid md:grid-cols-3 gap-10">
+                                {[
+                                    { img: 'page2_img1.jpeg', label: 'Relaxed', desc: 'Effortless silhouettes' },
+                                    { img: 'page2_img7.jpeg', label: 'Artisan Crafts', desc: 'Hand-finished details' },
+                                    { img: 'page2_img4.jpeg', label: 'Contemporary', desc: 'Modern minimalism' }
+                                ].map((item, i) => (
+                                    <div key={i} className="group cursor-pointer" onClick={() => setCurrentPage('collections')}>
+                                        <div className="img-premium aspect-[3/4] mb-6">
+                                            <img src={`images/${item.img}`} alt={item.label} className="w-full h-full object-cover" />
+                                        </div>
+                                        <span className="tag mb-4 inline-block">{item.label}</span>
+                                        <p className="text-[#5E6152]/80 text-base">{item.desc}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                    
+                    {/* Mood Strip */}
+                    <section className="py-6 overflow-hidden" style={{backgroundColor: 'var(--sage)'}}>
+                        <div className="flex gap-20 animate-scroll whitespace-nowrap">
+                            {['Minimalism', 'Effortless', 'Artisan Crafts', 'Contemporary', 'Timeless', 'Subtle & Tonal', 'Relaxed', 'Sophisticated'].map((word, i) => (
+                                <span key={i} className="font-serif text-3xl italic text-white/80 px-6">{word}</span>
+                            ))}
+                            {['Minimalism', 'Effortless', 'Artisan Crafts', 'Contemporary', 'Timeless', 'Subtle & Tonal', 'Relaxed', 'Sophisticated'].map((word, i) => (
+                                <span key={`r-${i}`} className="font-serif text-3xl italic text-white/80 px-6">{word}</span>
+                            ))}
+                        </div>
+                    </section>
+                    
+                    {/* Collections Preview */}
+                    <section className="py-28 px-6 bg-[#F0EBE3]">
+                        <div className="max-w-7xl mx-auto">
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16">
+                                <div>
+                                    <p className="text-sm tracking-[0.3em] uppercase text-[#5E6152]/60 mb-4">Featured</p>
+                                    <h2 className="font-serif text-5xl md:text-6xl text-[#5E6152]">The Collection</h2>
+                                </div>
+                                <button 
+                                    onClick={() => setCurrentPage('collections')}
+                                    className="mt-6 md:mt-0 text-base tracking-wider uppercase text-[#5E6152]/70 hover:text-[#5E6152] transition-colors flex items-center gap-3"
+                                >
+                                    View All
+                                    <span className="text-xl">→</span>
+                                </button>
+                            </div>
+                            
+                            <div className="grid md:grid-cols-4 gap-6">
+                                {['page8_img1.jpeg', 'page13_img1.jpeg', 'page4_img1.jpeg', 'page8_img3.jpeg'].map((img, i) => (
+                                    <div key={i} className="img-premium aspect-[3/4] cursor-pointer" onClick={() => setCurrentPage('collections')}>
+                                        <img src={`images/${img}`} alt={`Collection ${i+1}`} className="w-full h-full object-cover" />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                    
+                    {/* Color Palette Preview */}
+                    <section className="py-28 px-6" style={{backgroundColor: '#E8E3DB'}}>
+                        <div className="max-w-5xl mx-auto text-center">
+                            <p className="text-sm tracking-[0.3em] uppercase text-[#5E6152]/60 mb-4">Palette</p>
+                            <h2 className="font-serif text-5xl text-[#5E6152] mb-14">Timeless Neutrals</h2>
+                            
+                            <div className="flex justify-center gap-8 flex-wrap mb-10">
+                                {[
+                                    { name: 'Oatmeal', color: '#D4CFC7' },
+                                    { name: 'Taupe', color: '#A39B8B' },
+                                    { name: 'Sage', color: '#B8D4CE' },
+                                    { name: 'Sand', color: '#C9B99A' },
+                                    { name: 'Olive', color: '#5C6B52' },
+                                    { name: 'Teal', color: '#5B8A8A' },
+                                ].map((c, i) => (
+                                    <div key={i} className="text-center">
+                                        <div className="swatch mx-auto mb-4 shadow-md" style={{backgroundColor: c.color}}></div>
+                                        <span className="text-sm tracking-wider uppercase text-[#5E6152]/70">{c.name}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            <p className="text-[#5E6152]/70 text-base">Muted & harmonious colours that transcend seasons</p>
+                        </div>
+                    </section>
+                    
+                    {/* CTA Section */}
+                    <section className="relative py-36 px-6 overflow-hidden" style={{backgroundColor: '#9FB8AD'}}>
+                        <div className="absolute inset-0 opacity-20">
+                            <img src="images/page3_img7.jpeg" alt="" className="w-full h-full object-cover" />
+                        </div>
+                        <div className="relative z-10 max-w-3xl mx-auto text-center">
+                            <h2 className="font-serif text-5xl md:text-6xl text-white mb-8">Discover Your Style</h2>
+                            <p className="text-white/80 text-xl mb-12">Explore our collections of artisan-crafted pieces</p>
+                            <button onClick={() => setCurrentPage('collections')} className="btn-primary bg-[#F0EBE3] !text-[#5E6152]">
+                                <span>Shop Collections</span>
+                            </button>
+                        </div>
+                    </section>
+                </div>
+            );
+            
+            // Our Story Page
+            const StoryPage = () => (
+                <div className="pt-24 animate-fade">
+                    {/* Hero */}
+                    <section className="py-24 px-6 bg-[#F0EBE3]">
+                        <div className="max-w-4xl mx-auto text-center">
+                            <p className="text-sm tracking-[0.3em] uppercase text-[#5E6152]/60 mb-6">Our Story</p>
+                            <h1 className="font-serif text-6xl md:text-7xl text-[#5E6152] mb-8">The Journal</h1>
+                            <div className="w-24 h-px bg-[#5E6152]/30 mx-auto"></div>
+                        </div>
+                    </section>
+                    
+                    {/* Story Content */}
+                    <section className="py-20 px-6 bg-[#F0EBE3]">
+                        <div className="max-w-6xl mx-auto">
+                            <div className="grid md:grid-cols-2 gap-20 items-center mb-28">
+                                <div className="img-premium aspect-[4/5]">
+                                    <img src="images/page1_img1.jpeg" alt="Brand story" className="w-full h-full object-cover" />
+                                </div>
+                                <div>
+                                    <p className="text-sm tracking-[0.3em] uppercase text-[#5E6152]/60 mb-6">Philosophy</p>
+                                    <h2 className="font-serif text-4xl md:text-5xl text-[#5E6152] mb-8 leading-tight">
+                                        Embracing <span className="italic">minimalism</span> with intricate <span className="italic">artisanal crafts</span>
+                                    </h2>
+                                    <p className="text-[#5E6152]/80 text-lg leading-relaxed mb-6">
+                                        The Journal is a brand that believes in the power of subtle details. Each piece 
+                                        tells a story of memorable craftsmanship, where modern minimalism meets 
+                                        traditional artisan techniques.
+                                    </p>
+                                    <p className="text-[#5E6152]/80 text-lg leading-relaxed">
+                                        The collection is carefree, modern yet dreamy and defined by an unconventional 
+                                        sophistication that makes every piece feel like a statement.
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            {/* Mood & Concept */}
+                            <div className="text-center mb-16">
+                                <p className="text-sm tracking-[0.3em] uppercase text-[#5E6152]/60 mb-4">Mood & Concept</p>
+                                <h3 className="font-serif text-4xl text-[#5E6152]">Our Pillars</h3>
+                            </div>
+                            
+                            <div className="grid md:grid-cols-5 gap-8 mb-28">
+                                {[
+                                    { img: 'page2_img1.jpeg', label: 'Relaxed' },
+                                    { img: 'page2_img5.jpeg', label: 'Effortless' },
+                                    { img: 'page2_img7.jpeg', label: 'Artisan Crafts' },
+                                    { img: 'page2_img4.jpeg', label: 'Contemporary' },
+                                    { img: 'page2_img3.jpeg', label: 'Subtle & Tonal' }
+                                ].map((item, i) => (
+                                    <div key={i} className="text-center">
+                                        <div className="img-premium aspect-[3/4] mb-5">
+                                            <img src={`images/${item.img}`} alt={item.label} className="w-full h-full object-cover" />
+                                        </div>
+                                        <span className="tag">{item.label}</span>
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            {/* Quote */}
+                            <div className="max-w-4xl mx-auto text-center py-20 border-t border-b border-[#5E6152]/20">
+                                <p className="font-serif text-3xl md:text-4xl text-[#5E6152] italic leading-relaxed">
+                                    "Easy to wear and put together to create a look that is effortlessly stylish"
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            );
+            
+            // Collections Page
+            const CollectionsPage = () => {
+                const categories = [
+                    { id: 'all', label: 'All' },
+                    { id: 'embroidery', label: 'Embroidery' },
+                    { id: 'knitwear', label: 'Knitwear' },
+                    { id: 'silhouettes', label: 'Silhouettes' },
+                    { id: 'coords', label: 'Co-ords' },
+                    { id: 'outerwear', label: 'Outerwear' },
+                    { id: 'bottoms', label: 'Bottoms' }
+                ];
+                
+                const products = {
+                    embroidery: ['page8_img1.jpeg', 'page8_img2.png', 'page8_img3.jpeg', 'page9_img1.jpeg', 'page9_img2.jpeg', 'page9_img3.jpeg'],
+                    knitwear: ['page10_img1.jpeg', 'page10_img2.jpeg', 'page10_img3.jpeg', 'page11_img1.jpeg', 'page11_img3.jpeg'],
+                    silhouettes: ['page13_img1.jpeg', 'page13_img2.png', 'page13_img3.jpeg', 'page6_img4.jpeg', 'page6_img5.jpeg'],
+                    coords: ['page14_img1.png', 'page14_img2.jpeg', 'page14_img3.jpeg'],
+                    outerwear: ['page15_img1.jpeg', 'page15_img2.jpeg', 'page15_img3.jpeg', 'page15_img4.jpeg', 'page15_img5.jpeg'],
+                    bottoms: ['page16_img1.jpeg', 'page16_img2.png', 'page16_img3.png', 'page16_img4.jpeg']
+                };
+                
+                const allProducts = Object.values(products).flat();
+                const displayProducts = activeCategory === 'all' ? allProducts : products[activeCategory] || [];
+                
+                return (
+                    <div className="pt-24 animate-fade">
+                        {/* Header */}
+                        <section className="py-24 px-6 bg-[#F0EBE3]">
+                            <div className="max-w-4xl mx-auto text-center">
+                                <p className="text-sm tracking-[0.3em] uppercase text-[#5E6152]/60 mb-6">Discover</p>
+                                <h1 className="font-serif text-6xl md:text-7xl text-[#5E6152] mb-8">Collections</h1>
+                                <p className="text-[#5E6152]/80 text-xl max-w-xl mx-auto">
+                                    Explore our curated selection of artisan-crafted pieces, each designed with 
+                                    meticulous attention to detail.
+                                </p>
+                            </div>
+                        </section>
+                        
+                        {/* Filter */}
+                        <section className="sticky top-20 z-30 bg-[#F0EBE3] border-b border-[#5E6152]/10 py-5 px-6">
+                            <div className="max-w-7xl mx-auto">
+                                <div className="flex gap-8 overflow-x-auto pb-2 justify-center">
+                                    {categories.map(cat => (
+                                        <button
+                                            key={cat.id}
+                                            onClick={() => setActiveCategory(cat.id)}
+                                            className={`text-sm tracking-widest uppercase whitespace-nowrap transition-all pb-2 border-b-2 ${
+                                                activeCategory === cat.id 
+                                                    ? 'text-[#5E6152] border-[#5E6152]' 
+                                                    : 'text-[#5E6152]/50 border-transparent hover:text-[#5E6152]/80'
+                                            }`}
+                                        >
+                                            {cat.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+                        
+                        {/* Products Grid */}
+                        <section className="py-16 px-6 bg-[#F0EBE3]">
+                            <div className="max-w-7xl mx-auto">
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                    {displayProducts.map((img, i) => (
+                                        <div key={i} className="img-premium aspect-[3/4] cursor-pointer">
+                                            <img src={`images/${img}`} alt={`Product ${i+1}`} className="w-full h-full object-cover" />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                );
+            };
+            
+            // Craftsmanship Page
+            const CraftsmanshipPage = () => (
+                <div className="pt-24 animate-fade">
+                    {/* Header */}
+                    <section className="py-24 px-6 bg-[#F0EBE3]">
+                        <div className="max-w-4xl mx-auto text-center">
+                            <p className="text-sm tracking-[0.3em] uppercase text-[#5E6152]/60 mb-6">The Art</p>
+                            <h1 className="font-serif text-6xl md:text-7xl text-[#5E6152] mb-8">Craftsmanship</h1>
+                            <p className="text-[#5E6152]/80 text-xl max-w-xl mx-auto">
+                                Every detail matters. From subtle embroidery to delicate trims, 
+                                our pieces are crafted with intention.
+                            </p>
+                        </div>
+                    </section>
+                    
+                    {/* Key Characteristics */}
+                    <section className="py-20 px-6" style={{backgroundColor: '#E8E3DB'}}>
+                        <div className="max-w-6xl mx-auto">
+                            <div className="grid md:grid-cols-2 gap-20 items-center">
+                                <div>
+                                    <p className="text-sm tracking-[0.3em] uppercase text-[#5E6152]/60 mb-4">Key Characteristics</p>
+                                    <h2 className="font-serif text-4xl text-[#5E6152] mb-10">Subtle Details</h2>
+                                    <ul className="space-y-5">
+                                        {['Washed Look', 'Soft & Smooth Hand Feel', 'Embroidery & Embellishments', 'Delicate Trims', 'Minimal Detailing'].map((item, i) => (
+                                            <li key={i} className="flex items-center gap-4">
+                                                <span className="w-2 h-2 bg-sage-dark rounded-full" style={{backgroundColor: 'var(--sage-dark)'}}></span>
+                                                <span className="text-[#5E6152]/80 text-lg">{item}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                                <div className="grid grid-cols-2 gap-5">
+                                    <div className="img-premium aspect-square">
+                                        <img src="images/page6_img4.jpeg" alt="Detail" className="w-full h-full object-cover" />
+                                    </div>
+                                    <div className="img-premium aspect-square mt-10">
+                                        <img src="images/page6_img5.jpeg" alt="Detail" className="w-full h-full object-cover" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    {/* Embroidery Types */}
+                    <section className="py-24 px-6 bg-[#F0EBE3]">
+                        <div className="max-w-6xl mx-auto">
+                            <div className="text-center mb-16">
+                                <h2 className="font-serif text-4xl text-[#5E6152]">Embroidery Techniques</h2>
+                            </div>
+                            
+                            <div className="grid md:grid-cols-3 gap-10 mb-16">
+                                <div className="text-center">
+                                    <div className="img-premium aspect-[3/4] mb-6">
+                                        <img src="images/page8_img1.jpeg" alt="Subtle embroidery" className="w-full h-full object-cover" />
+                                    </div>
+                                    <h3 className="font-serif text-2xl text-[#5E6152] mb-3">Subtle & Tonal</h3>
+                                    <p className="text-[#5E6152]/70 text-base">Understated elegance in harmonious colours</p>
+                                </div>
+                                <div className="text-center">
+                                    <div className="img-premium aspect-[3/4] mb-6">
+                                        <img src="images/page9_img3.jpeg" alt="3D embroidery" className="w-full h-full object-cover" />
+                                    </div>
+                                    <h3 className="font-serif text-2xl text-[#5E6152] mb-3">3D Textured</h3>
+                                    <p className="text-[#5E6152]/70 text-base">Dimensional effects on jersey & knitwear</p>
+                                </div>
+                                <div className="text-center">
+                                    <div className="img-premium aspect-[3/4] mb-6">
+                                        <img src="images/page12_img2.jpeg" alt="Glitter embroidery" className="w-full h-full object-cover" />
+                                    </div>
+                                    <h3 className="font-serif text-2xl text-[#5E6152] mb-3">Glitter Embellishments</h3>
+                                    <p className="text-[#5E6152]/70 text-base">Subtle sparkle for special moments</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    {/* Materials */}
+                    <section className="py-24 px-6" style={{backgroundColor: 'var(--sage)', opacity: 0.9}}>
+                        <div className="max-w-5xl mx-auto text-center">
+                            <p className="text-sm tracking-[0.3em] uppercase text-white/70 mb-4">Premium</p>
+                            <h2 className="font-serif text-5xl text-white mb-14">Key Fabric Materials</h2>
+                            
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-10 text-white">
+                                <div>
+                                    <p className="font-serif text-2xl mb-5">Linen</p>
+                                    <p className="text-base text-white/70">100% Linen</p>
+                                    <p className="text-base text-white/70">Linen Tencel</p>
+                                    <p className="text-base text-white/70">Linen Lyocell</p>
+                                    <p className="text-base text-white/70">Linen Viscose</p>
+                                </div>
+                                <div>
+                                    <p className="font-serif text-2xl mb-5">Cotton</p>
+                                    <p className="text-base text-white/70">100% Cotton</p>
+                                    <p className="text-base text-white/70">Cotton Spandex</p>
+                                    <p className="text-base text-white/70">Cotton Linen</p>
+                                </div>
+                                <div>
+                                    <p className="font-serif text-2xl mb-5">Blends</p>
+                                    <p className="text-base text-white/70">Linen Elasthane</p>
+                                    <p className="text-base text-white/70">Cotton Linen</p>
+                                </div>
+                                <div>
+                                    <p className="font-serif text-2xl mb-5">Natural</p>
+                                    <p className="text-base text-white/70">100% Ramie</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    {/* Colour Palette */}
+                    <section className="py-28 px-6 bg-[#F0EBE3]">
+                        <div className="max-w-6xl mx-auto">
+                            <div className="text-center mb-16">
+                                <p className="text-sm tracking-[0.3em] uppercase text-[#5E6152]/60 mb-4">Palette</p>
+                                <h2 className="font-serif text-5xl text-[#5E6152]">Colour Stories</h2>
+                            </div>
+                            
+                            <div className="grid md:grid-cols-4 gap-10">
+                                {[
+                                    { name: 'Timeless Neutral', colors: ['#1C1C1C', '#D4CFC7', '#A39B8B', '#6B5344', '#F5EFE0'] },
+                                    { name: 'Bloomsoft', colors: ['#9A8B7A', '#8B2346', '#E8C4C4', '#FAF8F5', '#C9B99A'] },
+                                    { name: 'Earthbound', colors: ['#5C6B52', '#FAF8F5', '#B5B0A8', '#8B8469', '#2D4A3E'] },
+                                    { name: 'Seabreeze', colors: ['#5B8A8A', '#F2EDE3', '#C5B358', '#A8C4B8', '#F5F3EE'] }
+                                ].map((palette, i) => (
+                                    <div key={i}>
+                                        <span className="tag mb-6 block text-center">{palette.name}</span>
+                                        <div className="flex flex-wrap gap-3 justify-center">
+                                            {palette.colors.map((color, j) => (
+                                                <div key={j} className="swatch" style={{backgroundColor: color, width: '45px', height: '45px'}}></div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            );
+            
+            // Lookbook Page
+            const LookbookPage = () => (
+                <div className="pt-24 animate-fade">
+                    {/* Header */}
+                    <section className="py-24 px-6 bg-[#F0EBE3]">
+                        <div className="max-w-4xl mx-auto text-center">
+                            <p className="text-sm tracking-[0.3em] uppercase text-[#5E6152]/60 mb-6">Inspiration</p>
+                            <h1 className="font-serif text-6xl md:text-7xl text-[#5E6152] mb-8">Lookbook</h1>
+                            <p className="text-[#5E6152]/80 text-xl max-w-xl mx-auto">
+                                Style inspiration for the modern minimalist
+                            </p>
+                        </div>
+                    </section>
+                    
+                    {/* Combinations */}
+                    <section className="py-20 px-6 bg-[#F0EBE3]">
+                        <div className="max-w-7xl mx-auto">
+                            <div className="text-center mb-14">
+                                <h2 className="font-serif text-4xl text-[#5E6152]">Combinations</h2>
+                            </div>
+                            
+                            <div className="grid md:grid-cols-3 gap-10 mb-24">
+                                {[
+                                    { img: 'page4_img1.jpeg', label: 'Minimalism Contemporary' },
+                                    { img: 'page4_img2.jpeg', label: 'Effortless' },
+                                    { img: 'page4_img3.jpeg', label: 'Timeless' }
+                                ].map((item, i) => (
+                                    <div key={i} className="text-center">
+                                        <div className="img-premium aspect-[3/5] mb-6">
+                                            <img src={`images/${item.img}`} alt={item.label} className="w-full h-full object-cover" />
+                                        </div>
+                                        <span className="tag">{item.label}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                    
+                    {/* Styling Tips */}
+                    <section className="py-20 px-6" style={{backgroundColor: '#E8E3DB'}}>
+                        <div className="max-w-6xl mx-auto">
+                            <div className="text-center mb-14">
+                                <h2 className="font-serif text-4xl text-[#5E6152]">Styling with Scarfs</h2>
+                            </div>
+                            
+                            <div className="grid md:grid-cols-3 gap-8">
+                                <div className="md:col-span-1 img-premium aspect-[3/4]">
+                                    <img src="images/page5_img1.jpeg" alt="Scarf styling" className="w-full h-full object-cover" />
+                                </div>
+                                <div className="md:col-span-2 grid grid-cols-2 gap-5">
+                                    <div className="img-premium aspect-square">
+                                        <img src="images/page5_img2.jpeg" alt="Scarfs" className="w-full h-full object-cover object-top" />
+                                    </div>
+                                    <div className="img-premium aspect-square">
+                                        <img src="images/page5_img3.png" alt="Scarf detail" className="w-full h-full object-cover" />
+                                    </div>
+                                    <div className="col-span-2 img-premium aspect-[2/1]">
+                                        <img src="images/page5_img4.jpeg" alt="Scarf collection" className="w-full h-full object-cover" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    {/* Gallery Grid */}
+                    <section className="py-20 px-6 bg-[#F0EBE3]">
+                        <div className="max-w-7xl mx-auto">
+                            <div className="text-center mb-14">
+                                <h2 className="font-serif text-4xl text-[#5E6152]">Style Gallery</h2>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+                                {['page3_img1.jpeg', 'page3_img3.jpeg', 'page3_img4.jpeg', 'page3_img5.jpeg', 
+                                  'page3_img7.jpeg', 'page2_img8.jpeg', 'page11_img8.jpeg', 'page14_img2.jpeg'].map((img, i) => (
+                                    <div key={i} className={`img-premium ${i === 4 ? 'md:col-span-2 md:row-span-2' : ''}`}>
+                                        <img src={`images/${img}`} alt={`Look ${i+1}`} className="w-full h-full object-cover aspect-square" />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+                    
+                    {/* Prints */}
+                    <section className="py-20 px-6" style={{backgroundColor: '#E8E3DB'}}>
+                        <div className="max-w-6xl mx-auto">
+                            <div className="text-center mb-14">
+                                <h2 className="font-serif text-4xl text-[#5E6152]">Prints</h2>
+                                <p className="text-[#5E6152]/70 text-lg mt-5">Muted & harmonious colours with sophisticated, vintage & elegant designs</p>
+                            </div>
+                            
+                            <div className="grid md:grid-cols-3 gap-8">
+                                <div className="img-premium aspect-square">
+                                    <img src="images/page17_img1.jpeg" alt="Print 1" className="w-full h-full object-cover" />
+                                </div>
+                                <div className="img-premium aspect-square">
+                                    <img src="images/page17_img2.jpeg" alt="Print 2" className="w-full h-full object-cover" />
+                                </div>
+                                <div className="img-premium aspect-square">
+                                    <img src="images/page17_img3.jpeg" alt="Print 3" className="w-full h-full object-cover" />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            );
+            
+            // Footer
+            const Footer = () => (
+                <footer className="py-24 px-6" style={{backgroundColor: '#5E6152'}}>
+                    <div className="max-w-6xl mx-auto">
+                        <div className="grid md:grid-cols-4 gap-14 mb-16">
+                            <div className="md:col-span-2">
+                                <h3 className="font-serif text-4xl text-white mb-6">The Journal</h3>
+                                <p className="text-white/60 text-lg leading-relaxed max-w-md">
+                                    Artisan minimalism for the modern woman. Each piece tells a story of 
+                                    memorable details and unconventional sophistication.
+                                </p>
+                            </div>
+                            <div>
+                                <p className="text-sm tracking-widest uppercase text-white/40 mb-6">Navigate</p>
+                                <div className="space-y-4">
+                                    {navItems.map(item => (
+                                        <button 
+                                            key={item.id}
+                                            onClick={() => setCurrentPage(item.id)}
+                                            className="block text-white/70 hover:text-white transition-colors text-base"
+                                        >
+                                            {item.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <p className="text-sm tracking-widest uppercase text-white/40 mb-6">Connect</p>
+                                <div className="space-y-4 text-white/70 text-base">
+                                    <p>Instagram</p>
+                                    <p>Pinterest</p>
+                                    <p>Facebook</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="border-t border-white/10 pt-10 flex flex-col md:flex-row justify-between items-center">
+                            <p className="text-white/40 text-sm">© 2024 The Journal. All rights reserved.</p>
+                            <p className="text-white/40 text-sm mt-4 md:mt-0">Artisan Minimalism</p>
+                        </div>
+                    </div>
+                </footer>
+            );
+            
+            return (
+                <div className="min-h-screen">
+                    <Navigation />
+                    <main>
+                        {currentPage === 'home' && <HomePage />}
+                        {currentPage === 'story' && <StoryPage />}
+                        {currentPage === 'collections' && <CollectionsPage />}
+                        {currentPage === 'craftsmanship' && <CraftsmanshipPage />}
+                        {currentPage === 'lookbook' && <LookbookPage />}
+                    </main>
+                    <Footer />
+                </div>
+            );
+        };
+        
+        ReactDOM.render(<TheJournalWebsite />, document.getElementById('root'));
+    </script>
+</body>
+</html>
